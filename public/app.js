@@ -1,5 +1,5 @@
 $.getJSON("/articles", articles => {
-  $("#articles").append(
+  $("#articles").prepend(
     articles.map(a => `<p data-id='${a._id}'>${a.title}<br />${a.link}</p>`)
   );
 });

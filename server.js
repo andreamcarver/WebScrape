@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/gooseScrape");
+mongoose.connect("mongodb://localhost/gooseScrape2");
 
 // ROUTES
 
@@ -35,9 +35,10 @@ app.get("/", function(req, res) {
   res.send("index.html");
 });
 
+// Scrape Route
 app.get("/scrape", function(req, res) {
-  // First, we grab the body of the html with request
-  axios.get("http://www.echojs.com/").then(function(response) {
+  // axios performs a similar function as either request/fetch
+  axios.get("https://www.nytimes.com/").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
 
@@ -54,55 +55,19 @@ app.get("/scrape", function(req, res) {
         .children("a")
         .attr("href");
 
-      // Create a new Article using the `result` object built from scraping
-      db.Article.create(result)
+      db.Article.create(result);
+      console
+        .log(result)
         .then(function(dbArticle) {
-          // View the added result in the console
-          console.log(dbArticle);
+          console.log("Articles:" + dbArticle);
         })
         .catch(function(err) {
-          // If an error occurred, send it to the client
           return res.json(err);
         });
     });
-
-    // If we were able to successfully scrape and save an Article, send a message to the client
-    res.send("Scrape Complete");
+    res.send("Scrape Successful!");
   });
 });
-
-// Scrape Route
-// app.get("/scrape", function(req, res) {
-//   console.log("The goose is scraping");
-//   // axios performs a similar function as either request/fetch
-//   axios.get("http://www.echojs.com/").then(function(response) {
-//     // Then, we load that into cheerio and save it to $ for a shorthand selector
-//     var $ = cheerio.load(response.data);
-
-//     // Now, we grab every h2 within an article tag, and do the following:
-//     $("article h2").each(function(i, element) {
-//       // Save an empty result object
-//       var result = {};
-
-//       // Add the text and href of every link, and save them as properties of the result object
-//       result.title = $(this)
-//         .children("a")
-//         .text();
-//       result.link = $(this)
-//         .children("a")
-//         .attr("href");
-
-//       db.Article.create(result)
-//         .then(function(dbArticle) {
-//           console.log("Articles:" + dbArticle);
-//         })
-//         .catch(function(err) {
-//           return res.json(err);
-//         });
-//     });
-//     res.send("Scrape Successful!");
-//   });
-// });
 
 // Route for grabbing a specific Article by id, populate it with it's note
 app.get("/articles/:id", function(req, res) {
@@ -165,6 +130,7 @@ app.post("/articles/:id", function(req, res) {
       );
     })
     .then(function(dbArticle) {
+      console.log(dbArticle);
       // If we were able to successfully update an Article, send it back to the client
       res.json(dbArticle);
     })
