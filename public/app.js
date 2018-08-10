@@ -33,7 +33,9 @@ $(document).on("click", "p", function() {
       );
       // A button to submit a new note, with the id of the article saved to it
       $("#notes").append(
-        "<button data-id='" + data._id + "' id='savenote'>Save Note</button>"
+        "<a class='waves-effect waves-light btn' data-id='" +
+          data._id +
+          "' id='savenote'>Save Note</a>"
       );
 
       // If there's a note in the article
